@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "hibi",
+    "name": "日々",
     "slug": "hibi",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -15,7 +15,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.sashimizakana.hibi"
     },
     "web": {
       "bundler": "metro",
@@ -30,12 +31,21 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#080808"
         }
-      ]
+      ],
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "40126172-fbbd-4203-81e3-da180bddc084"
+      }
     }
   }
 }

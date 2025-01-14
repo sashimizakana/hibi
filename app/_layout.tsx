@@ -1,39 +1,113 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { createTheme, ThemeProvider, useTheme, Text } from "@rneui/themed";
+import { Stack, useGlobalSearchParams, useRouter } from "expo-router";
+import { View } from "react-native";
+import {
+  SafeAreaProvider,
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
+import dayjs from "dayjs";
+import "dayjs/locale/ja";
+import { useEffect } from "react";
+import expoDB, { db } from "@/db/db";
+import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
+import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
+import migrations from "@/db/migrations/migrations";
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+dayjs.locale("ja");
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+function Index() {
+  const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
+  return (
+    <View
+      style={{
+        flex: 1,
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+        backgroundColor: theme.colors.background,
+      }}
+    >
+      <Stack
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: theme.colors.background,
+          },
+          headerTitleStyle: {
+            color: theme.colors.black,
+          },
+          headerTintColor: theme.colors.primary,
+          navigationBarColor: theme.colors.background,
+          contentStyle: {
+            backgroundColor: theme.colors.background,
+            flex: 1,
+          },
+        }}
+      >
+        <Stack.Screen
+          name="index"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="date/[date]"
+          options={({ route }) => ({
+            title: route.params
+              ? dayjs((route.params as any).date).format("YYYY年MM月DD日(ddd)")
+              : "", // ページタイトルを変更
+          })}
+        />
+      </Stack>
+    </View>
+  );
+}
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
+  useDrizzleStudio(db);
+  const myTheme = createTheme({ mode: "dark" });
+  //初回表示時に本日の詳細ページを開く
+  const router = useRouter();
+  const params = useGlobalSearchParams();
+  const { success, error } = useMigrations(expoDB, migrations);
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
+    if (!params.date && success) {
+      router.push(`./date/${dayjs().format("YYYY-MM-DD")}`);
     }
-  }, [loaded]);
+  }, [success]);
 
-  if (!loaded) {
-    return null;
+  if (error) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: myTheme.darkColors?.background,
+        }}
+      >
+        <Text>Migration error: {error.message}</Text>
+      </View>
+    );
+  }
+  if (!success) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: myTheme.darkColors?.background,
+        }}
+      >
+        <Text>Migration is in progress...</Text>
+      </View>
+    );
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
+    <ThemeProvider theme={myTheme}>
+      <Index></Index>
     </ThemeProvider>
   );
 }
