@@ -1,24 +1,25 @@
 import _ from "lodash";
-import { Input, Text, useTheme } from "@rneui/themed";
 import { useState, FC, useEffect, Suspense, useCallback } from "react";
-import { TextInput, View } from "react-native";
+import { View } from "react-native";
 import MarkSelector from "@/components/MarkSelector";
 import { useGlobalSearchParams } from "expo-router";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { DayDiaryAtom, DiaryAtom } from "@/atoms/diary";
+import { useAppTheme } from "@/lib/theme";
+import { Text, TextInput } from "react-native-paper";
 
-const colors = ["#26547C", "#EF476F", "#FFD166", "#06D6A0", "#FCFCFC"];
+const markColors = ["#26547C", "#EF476F", "#FFD166", "#06D6A0", "#FCFCFC"];
 
 interface SectionHeaderProps {
   children: string;
 }
 
 const SectionHeader: FC<SectionHeaderProps> = ({ children }) => {
-  const { theme } = useTheme();
+  const theme = useAppTheme();
   return (
     <Text
-      h4
-      style={{ marginTop: 30, paddingLeft: 10, color: theme.colors.grey2 }}
+      variant="headlineMedium"
+      style={{ marginTop: 30, paddingLeft: 10, color: theme.colors.secondary }}
     >
       {children}
     </Text>
@@ -27,6 +28,7 @@ const SectionHeader: FC<SectionHeaderProps> = ({ children }) => {
 
 const DateDetail = () => {
   const params = useGlobalSearchParams();
+  const { colors } = useAppTheme();
   const [editing, setEditing] = useState<any>({
     date: params.date as string,
     text: "",
@@ -66,10 +68,19 @@ const DateDetail = () => {
     <Suspense fallback={<View></View>}>
       <View style={{ flex: 1 }}>
         <View>
-          <Input
+          <TextInput
             onChangeText={onChangeText}
             value={editing.text}
             placeholder="どんな日？"
+            style={[
+              styles.input,
+              {
+                backgroundColor: colors.background,
+              },
+            ]}
+            underlineColor={colors.border}
+            outlineColor="transparent"
+            activeOutlineColor="transparent"
           />
         </View>
         <View
@@ -78,7 +89,7 @@ const DateDetail = () => {
             justifyContent: "space-around",
           }}
         >
-          {colors.map((color) => (
+          {markColors.map((color) => (
             <MarkSelector
               key={color}
               color={color}
@@ -99,9 +110,7 @@ const DateDetail = () => {
 };
 const styles = {
   input: {
-    height: 40,
     margin: 12,
-    borderWidth: 1,
   },
 };
 export default DateDetail;

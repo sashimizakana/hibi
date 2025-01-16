@@ -1,7 +1,7 @@
-import { Button, color } from "@rneui/base";
-import { useTheme, Text } from "@rneui/themed";
+import { Button, IconButton, Text } from "react-native-paper";
 import { FC } from "react";
 import { View } from "react-native";
+import { useAppTheme } from "@/lib/theme";
 
 type MonthHeaderProps = {
   onMove: (offset: number) => void;
@@ -9,7 +9,7 @@ type MonthHeaderProps = {
 };
 
 const MonthHeader: FC<MonthHeaderProps> = ({ onMove, children }) => {
-  const { theme } = useTheme();
+  const theme = useAppTheme();
   function move(offset: number) {
     if (onMove) {
       onMove(offset);
@@ -23,28 +23,20 @@ const MonthHeader: FC<MonthHeaderProps> = ({ onMove, children }) => {
         alignItems: "center",
         height: 50,
         borderBottomWidth: 2,
-        borderBottomColor: theme.colors.grey4,
+        borderBottomColor: theme.colors.border,
       }}
     >
-      <Button
+      <IconButton
         onPress={() => move(-1)}
-        icon={{
-          name: "chevron-left",
-          type: "font-awesome",
-          color: theme.colors.primary,
-        }}
-        type="clear"
-      ></Button>
+        icon="chevron-left"
+        iconColor={theme.colors.primary}
+      ></IconButton>
       <Text style={{ fontSize: 30 }}>{children}</Text>
-      <Button
+      <IconButton
         onPress={() => move(1)}
-        icon={{
-          name: "chevron-right",
-          type: "font-awesome",
-          color: theme.colors.primary,
-        }}
-        type="clear"
-      ></Button>
+        icon="chevron-right"
+        iconColor={theme.colors.primary}
+      ></IconButton>
     </View>
   );
 };

@@ -1,14 +1,15 @@
 import type { CalendarDate } from "@/app";
 import { FC } from "react";
 import { View, Pressable } from "react-native";
-import { Text, useTheme } from "@rneui/themed";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
+import { Text } from "react-native-paper";
+import { useAppTheme } from "@/lib/theme";
 type DateRowProps = {
   date: CalendarDate;
 };
 const DateRow: FC<DateRowProps> = ({ date }) => {
-  const { theme } = useTheme();
+  const theme = useAppTheme();
   const day = dayjs(date.date).day();
   const router = useRouter();
   let color;
@@ -33,7 +34,7 @@ const DateRow: FC<DateRowProps> = ({ date }) => {
         alignItems: "center",
         justifyContent: "center",
         borderBottomWidth: 1,
-        borderBottomColor: theme.colors.grey3,
+        borderBottomColor: theme.colors.border,
         backgroundColor: color,
       }}
     >
@@ -42,7 +43,7 @@ const DateRow: FC<DateRowProps> = ({ date }) => {
           width: 30,
           height: "100%",
           borderRightWidth: 1,
-          borderRightColor: theme.colors.grey3,
+          borderRightColor: theme.colors.border,
           justifyContent: "center",
         }}
       >
@@ -53,7 +54,7 @@ const DateRow: FC<DateRowProps> = ({ date }) => {
           width: 30,
           height: "100%",
           borderRightWidth: 1,
-          borderRightColor: theme.colors.grey3,
+          borderRightColor: theme.colors.border,
           justifyContent: "center",
         }}
       >

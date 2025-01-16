@@ -2,7 +2,7 @@
   "expo": {
     "name": "日々",
     "slug": "hibi",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -13,8 +13,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/title.png",
+        "backgroundColor": "#212a3c"
       },
       "package": "com.sashimizakana.hibi"
     },
@@ -28,10 +28,10 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/title.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#080808"
+          "backgroundColor": "#212a3c"
         }
       ],
       "expo-sqlite"

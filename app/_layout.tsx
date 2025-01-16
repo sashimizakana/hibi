@@ -1,11 +1,7 @@
-import { createTheme, ThemeProvider, useTheme, Text } from "@rneui/themed";
+import { PaperProvider, Text } from "react-native-paper";
 import { Stack, useGlobalSearchParams, useRouter } from "expo-router";
 import { View } from "react-native";
-import {
-  SafeAreaProvider,
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import dayjs from "dayjs";
 import "dayjs/locale/ja";
 import { useEffect } from "react";
@@ -13,11 +9,12 @@ import expoDB, { db } from "@/db/db";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import migrations from "@/db/migrations/migrations";
+import { useAppTheme } from "@/lib/theme";
 
 dayjs.locale("ja");
 
 function Index() {
-  const { theme } = useTheme();
+  const theme = useAppTheme();
   const insets = useSafeAreaInsets();
   return (
     <View
@@ -34,7 +31,7 @@ function Index() {
             backgroundColor: theme.colors.background,
           },
           headerTitleStyle: {
-            color: theme.colors.black,
+            color: theme.colors.text,
           },
           headerTintColor: theme.colors.primary,
           navigationBarColor: theme.colors.background,
@@ -65,7 +62,6 @@ function Index() {
 
 export default function RootLayout() {
   useDrizzleStudio(db);
-  const myTheme = createTheme({ mode: "dark" });
   //初回表示時に本日の詳細ページを開く
   const router = useRouter();
   const params = useGlobalSearchParams();
@@ -75,6 +71,7 @@ export default function RootLayout() {
       router.push(`./date/${dayjs().format("YYYY-MM-DD")}`);
     }
   }, [success]);
+  const theme = useAppTheme();
 
   if (error) {
     return (
@@ -83,7 +80,7 @@ export default function RootLayout() {
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: myTheme.darkColors?.background,
+          backgroundColor: theme.colors.background,
         }}
       >
         <Text>Migration error: {error.message}</Text>
@@ -97,7 +94,7 @@ export default function RootLayout() {
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: myTheme.darkColors?.background,
+          backgroundColor: theme.colors.background,
         }}
       >
         <Text>Migration is in progress...</Text>
@@ -106,8 +103,8 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider theme={myTheme}>
+    <PaperProvider theme={theme}>
       <Index></Index>
-    </ThemeProvider>
+    </PaperProvider>
   );
 }
