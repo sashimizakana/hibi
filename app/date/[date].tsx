@@ -1,10 +1,11 @@
+import _ from "lodash";
 import { Input, Text, useTheme } from "@rneui/themed";
-import { useState, FC, useEffect } from "react";
-import { View } from "react-native";
+import { useState, FC, useEffect, Suspense, useCallback } from "react";
+import { TextInput, View } from "react-native";
 import MarkSelector from "@/components/MarkSelector";
 import { useGlobalSearchParams } from "expo-router";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { DayDiaryAtom, DiaryAtom } from "@/atoms/diary";
-import { useAtom } from "jotai";
 
 const colors = ["#26547C", "#EF476F", "#FFD166", "#06D6A0", "#FCFCFC"];
 
@@ -25,67 +26,75 @@ const SectionHeader: FC<SectionHeaderProps> = ({ children }) => {
 };
 
 const DateDetail = () => {
-  const [dayDiary, setDayDiary] = useAtom(DayDiaryAtom);
-  const [diary, setDiary] = useAtom(DiaryAtom);
-  const [text, setText] = useState(diary?.text ?? "");
-  const [marks, setMarks] = useState<string[]>([]);
-  function toggleMark(color: string) {
-    setMarks((prev) => {
-      if (prev.includes(color)) {
-        return prev.filter((c) => c !== color);
-      } else {
-        return [...prev, color];
-      }
-    });
-  }
   const params = useGlobalSearchParams();
-  function onChangeText(value: string) {
-    setDiary({
-      date: params.date as string,
-      text: value,
-      marks: null,
-      tasks: null,
-    });
-    setText(value);
+  const [editing, setEditing] = useState<any>({
+    date: params.date as string,
+    text: "",
+    marks: [],
+  });
+  const setDate = useSetAtom(DayDiaryAtom);
+  const [diary, setDiary] = useAtom(DiaryAtom);
+  async function saveDiary(diary: any) {
+    const saved = await setDiary(diary);
+    setEditing(saved);
   }
+  const save = useCallback(_.debounce(saveDiary, 300), []);
   useEffect(() => {
-    setDayDiary(params.date as string);
+    setDate(params.date as string);
   }, [params.date]);
   useEffect(() => {
-    setText(diary?.text ?? "");
+    if (diary) {
+      setEditing(diary);
+    }
+    return () => setDate("");
   }, [diary]);
-  console.log("state", diary, text);
+  function toggleMark(color: string) {
+    let marks = editing.marks || [];
+    if (marks.includes(color)) {
+      marks = marks.filter((c: any) => c !== color);
+    } else {
+      marks.push(color);
+    }
+    setEditing({ ...editing, marks });
+    save({ ...editing, marks });
+  }
+  function onChangeText(text: string) {
+    setEditing({ ...editing, text });
+    save({ ...editing, text });
+  }
   return (
-    <View style={{ flex: 1 }}>
-      <View>
-        <Input
-          onChangeText={onChangeText}
-          value={text}
-          placeholder="どんな日？"
-        />
+    <Suspense fallback={<View></View>}>
+      <View style={{ flex: 1 }}>
+        <View>
+          <Input
+            onChangeText={onChangeText}
+            value={editing.text}
+            placeholder="どんな日？"
+          />
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-around",
+          }}
+        >
+          {colors.map((color) => (
+            <MarkSelector
+              key={color}
+              color={color}
+              isActive={editing.marks?.includes(color)}
+              onToggle={() => toggleMark(color)}
+            ></MarkSelector>
+          ))}
+        </View>
+        <View>
+          <SectionHeader>TODO</SectionHeader>
+        </View>
+        <View>
+          <SectionHeader>タスク</SectionHeader>
+        </View>
       </View>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-around",
-        }}
-      >
-        {colors.map((color) => (
-          <MarkSelector
-            key={color}
-            color={color}
-            isActive={marks.includes(color)}
-            onToggle={() => toggleMark(color)}
-          ></MarkSelector>
-        ))}
-      </View>
-      <View>
-        <SectionHeader>TODO</SectionHeader>
-      </View>
-      <View>
-        <SectionHeader>タスク</SectionHeader>
-      </View>
-    </View>
+    </Suspense>
   );
 };
 const styles = {

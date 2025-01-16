@@ -20,6 +20,9 @@ export const DayDiaryAtom = atom(dayjs().format("YYYY-MM-DD"));
 export const DiaryAtom = atom(
   async (get) => {
     const date = get(DayDiaryAtom);
+    if (!date) {
+      return;
+    }
     return (await db.select().from(diaries).where(eq(diaries.date, date))).at(
       0
     );

@@ -66,11 +66,33 @@ const DateRow: FC<DateRowProps> = ({ date }) => {
             justifyContent: "center",
             height: "100%",
             paddingLeft: 5,
+            position: "relative",
           }}
           onPress={() => {
             moveTo(date.date);
           }}
         >
+          <View
+            style={{
+              position: "absolute",
+              left: 2,
+              top: 2,
+              flexDirection: "row",
+              gap: 1,
+            }}
+          >
+            {date.diary?.marks?.map((mark: string) => (
+              <View
+                key={mark}
+                style={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: 5,
+                  backgroundColor: mark,
+                }}
+              ></View>
+            ))}
+          </View>
           <Text>{date.diary?.text}</Text>
         </Pressable>
       </View>

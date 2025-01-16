@@ -38,7 +38,6 @@ export default function Index() {
   }, [diaries]);
   useFocusEffect(
     useCallback(() => {
-      console.log("reload");
       refreshDiaries();
     }, [])
   );

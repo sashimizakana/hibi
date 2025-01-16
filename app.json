@@ -2,7 +2,7 @@
   "expo": {
     "name": "日々",
     "slug": "hibi",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -46,6 +46,12 @@
       "eas": {
         "projectId": "40126172-fbbd-4203-81e3-da180bddc084"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/40126172-fbbd-4203-81e3-da180bddc084"
     }
   }
 }
