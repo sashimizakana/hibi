@@ -1,25 +1,18 @@
-import { useCallback, useEffect, useState } from "react";
-import { View, FlatList } from "react-native";
+import { useEffect, useState } from "react";
+import { View } from "react-native";
 import dayjs from "dayjs";
-import { useAtom, useSetAtom } from "jotai";
-import { DiaryMonthAtom, MonthDiariesAtom } from "@/atoms/diary";
-import { useFocusEffect } from "expo-router";
+import { useSetAtom } from "jotai";
+import { fetchMonthDiariesAtom } from "@/atoms/diary";
 import Calendar from "@/components/Calendar";
 import PagerView from "react-native-pager-view";
 
 const PAGES = 2;
 export default function Index() {
   const [ym, setYm] = useState(dayjs().startOf("month").format("YYYY-MM"));
-  const refreshDiaries = useSetAtom(MonthDiariesAtom);
-  const setDiaryMonth = useSetAtom(DiaryMonthAtom);
+  const fetchMonthDiaries = useSetAtom(fetchMonthDiariesAtom);
   useEffect(() => {
-    setDiaryMonth(ym);
+    fetchMonthDiaries(ym);
   }, [ym]);
-  useFocusEffect(
-    useCallback(() => {
-      refreshDiaries();
-    }, [])
-  );
   const center = dayjs(ym + "-01").startOf("month");
   const pages: string[] = [];
   for (let i = 0; i < PAGES; i++) {
@@ -40,11 +33,7 @@ export default function Index() {
         onPageSelected={changePage}
       >
         {pages.map((ym, i) => (
-          <Calendar
-            ym={ym}
-            key={ym}
-            active={Math.floor(pages.length / 2) === i}
-          ></Calendar>
+          <Calendar ym={ym} key={ym}></Calendar>
         ))}
       </PagerView>
     </View>

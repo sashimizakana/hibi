@@ -7,6 +7,8 @@ import db from "@/db/db";
 import { diaries } from "@/db/schema";
 import { between } from "drizzle-orm";
 import { useFocusEffect } from "expo-router";
+import { DiariesAtom } from "@/atoms/diary";
+import { useAtomValue } from "jotai";
 
 export type CalendarDate = {
   label: string;
@@ -21,20 +23,7 @@ type CalendarProps = {
 export default function Calendar({ ym }: CalendarProps) {
   const date = dayjs(ym + "-01");
   const [calendar, setCalendar] = useState<CalendarDate[]>([]);
-  const [diaryMap, setDiaryMap] = useState<Map<string, any>>(new Map());
-  async function loadDiaries() {
-    const start = dayjs(`${ym}-01`).startOf("month").format("YYYY-MM-DD");
-    const end = dayjs(`${ym}-01`).endOf("month").format("YYYY-MM-DD");
-    const data = await db
-      .select()
-      .from(diaries)
-      .where(between(diaries.date, start, end));
-    const map = new Map();
-    data.forEach((diary) => {
-      map.set(diary.date, diary);
-    });
-    setDiaryMap(map);
-  }
+  const diaries = useAtomValue(DiariesAtom);
   useEffect(() => {
     const calendar = [];
     let cursor = dayjs(dayjs(ym + "-01").startOf("month"));
@@ -43,24 +32,14 @@ export default function Calendar({ ym }: CalendarProps) {
         label: cursor.format("D"),
         date: cursor.format("YYYY-MM-DD"),
         day: cursor.format("ddd"),
-        diary: diaryMap.get(cursor.format("YYYY-MM-DD")),
       });
       cursor = cursor.add(1, "day");
     }
     setCalendar(calendar);
   }, []);
-  useFocusEffect(
-    useCallback(() => {
-      loadDiaries();
-    }, [])
-  );
   function makeRow(item: CalendarDate) {
     return (
-      <DateRow
-        date={item}
-        diary={diaryMap.get(item.date)}
-        key={item.date}
-      ></DateRow>
+      <DateRow date={item} diary={diaries[item.date]} key={item.date}></DateRow>
     );
   }
   return (
