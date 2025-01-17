@@ -80,6 +80,7 @@ const DateDetail = () => {
           underlineColor={colors.border}
           outlineColor="transparent"
           activeOutlineColor="transparent"
+          multiline={true}
         />
       </View>
       <View

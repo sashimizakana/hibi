@@ -95,7 +95,9 @@ const DateRow: FC<DateRowProps> = ({ date, diary }) => {
               ></View>
             ))}
           </View>
-          <Text>{diary?.text}</Text>
+          <Text numberOfLines={1} ellipsizeMode="tail">
+            {diary?.text}
+          </Text>
         </Pressable>
       </View>
     </View>
