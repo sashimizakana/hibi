@@ -1,4 +1,4 @@
-import type { CalendarDate } from "@/app";
+import type { CalendarDate } from "@/components/Calendar";
 import { FC } from "react";
 import { View, Pressable } from "react-native";
 import dayjs from "dayjs";
@@ -7,10 +7,11 @@ import { Text } from "react-native-paper";
 import { useAppTheme } from "@/lib/theme";
 type DateRowProps = {
   date: CalendarDate;
+  diary: any;
 };
-const DateRow: FC<DateRowProps> = ({ date }) => {
-  const theme = useAppTheme();
+const DateRow: FC<DateRowProps> = ({ date, diary }) => {
   const day = dayjs(date.date).day();
+  const theme = useAppTheme();
   const router = useRouter();
   let color;
   switch (day) {
@@ -82,7 +83,7 @@ const DateRow: FC<DateRowProps> = ({ date }) => {
               gap: 1,
             }}
           >
-            {date.diary?.marks?.map((mark: string) => (
+            {diary?.marks?.map((mark: string) => (
               <View
                 key={mark}
                 style={{
@@ -94,7 +95,7 @@ const DateRow: FC<DateRowProps> = ({ date }) => {
               ></View>
             ))}
           </View>
-          <Text>{date.diary?.text}</Text>
+          <Text>{diary?.text}</Text>
         </Pressable>
       </View>
     </View>

@@ -7,13 +7,6 @@ import { useFocusEffect } from "expo-router";
 import Calendar from "@/components/Calendar";
 import PagerView from "react-native-pager-view";
 
-export type CalendarDate = {
-  label: string;
-  date: string;
-  day: string;
-  diary: any;
-};
-
 const PAGES = 2;
 export default function Index() {
   const [ym, setYm] = useState(dayjs().startOf("month").format("YYYY-MM"));
@@ -47,9 +40,12 @@ export default function Index() {
         onPageSelected={changePage}
       >
         {pages.map((ym, i) => (
-          <Calendar ym={ym} key={ym}></Calendar>
+          <Calendar
+            ym={ym}
+            key={ym}
+            active={Math.floor(pages.length / 2) === i}
+          ></Calendar>
         ))}
-        <Calendar ym={ym}></Calendar>
       </PagerView>
     </View>
   );

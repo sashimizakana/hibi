@@ -1,4 +1,5 @@
 import db from "@/db/db";
+import { loadable } from "jotai/utils";
 import { diaries } from "@/db/schema";
 import { between, eq } from "drizzle-orm";
 import { atom } from "jotai";
@@ -16,12 +17,17 @@ export const MonthDiariesAtom = atomWithRefresh(async (get) => {
     .add(2, "months")
     .endOf("month")
     .format("YYYY-MM-DD");
-  console.log(start, end);
-  return await db
+  const data = await db
     .select()
     .from(diaries)
     .where(between(diaries.date, start, end));
+  const map = new Map();
+  data.forEach((diary) => {
+    map.set(diary.date, diary);
+  });
+  return map;
 });
+export const MonthDiariesLoadableAtom = loadable(MonthDiariesAtom);
 
 export const DayDiaryAtom = atom(dayjs().format("YYYY-MM-DD"));
 export const DiaryAtom = atom(

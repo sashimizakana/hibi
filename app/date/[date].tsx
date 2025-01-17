@@ -65,47 +65,45 @@ const DateDetail = () => {
     save({ ...editing, text });
   }
   return (
-    <Suspense fallback={<View></View>}>
-      <View style={{ flex: 1 }}>
-        <View>
-          <TextInput
-            onChangeText={onChangeText}
-            value={editing.text}
-            placeholder="どんな日？"
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.background,
-              },
-            ]}
-            underlineColor={colors.border}
-            outlineColor="transparent"
-            activeOutlineColor="transparent"
-          />
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-around",
-          }}
-        >
-          {markColors.map((color) => (
-            <MarkSelector
-              key={color}
-              color={color}
-              isActive={editing.marks?.includes(color)}
-              onToggle={() => toggleMark(color)}
-            ></MarkSelector>
-          ))}
-        </View>
-        <View>
-          <SectionHeader>TODO</SectionHeader>
-        </View>
-        <View>
-          <SectionHeader>タスク</SectionHeader>
-        </View>
+    <View style={{ flex: 1 }}>
+      <View>
+        <TextInput
+          onChangeText={onChangeText}
+          value={editing.text}
+          placeholder="どんな日？"
+          style={[
+            styles.input,
+            {
+              backgroundColor: colors.background,
+            },
+          ]}
+          underlineColor={colors.border}
+          outlineColor="transparent"
+          activeOutlineColor="transparent"
+        />
       </View>
-    </Suspense>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-around",
+        }}
+      >
+        {markColors.map((color) => (
+          <MarkSelector
+            key={color}
+            color={color}
+            isActive={editing.marks?.includes(color)}
+            onToggle={() => toggleMark(color)}
+          ></MarkSelector>
+        ))}
+      </View>
+      <View>
+        <SectionHeader>TODO</SectionHeader>
+      </View>
+      <View>
+        <SectionHeader>タスク</SectionHeader>
+      </View>
+    </View>
   );
 };
 const styles = {
