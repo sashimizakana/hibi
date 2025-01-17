@@ -24,7 +24,7 @@ const DateRow: FC<DateRowProps> = ({ date }) => {
       color = theme.colors.background;
   }
   function moveTo(date: string) {
-    router.push(`./date/${date}`);
+    router.push(`/date/${date}`);
   }
   return (
     <View

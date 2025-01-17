@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { View, FlatList } from "react-native";
 import dayjs from "dayjs";
-import MonthHeader from "@/components/MonthHeader";
-import DateRow from "@/components/DateRow";
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import { DiaryMonthAtom, MonthDiariesAtom } from "@/atoms/diary";
 import { useFocusEffect } from "expo-router";
+import Calendar from "@/components/Calendar";
+import PagerView from "react-native-pager-view";
 
 export type CalendarDate = {
   label: string;
@@ -14,47 +14,43 @@ export type CalendarDate = {
   diary: any;
 };
 
+const PAGES = 2;
 export default function Index() {
-  const [date, setDate] = useState(dayjs().startOf("month"));
-  const [calendar, setCalendar] = useState<CalendarDate[]>([]);
-  const [diaries, refreshDiaries] = useAtom(MonthDiariesAtom);
-  const [, setDiaryMonth] = useAtom(DiaryMonthAtom);
+  const [ym, setYm] = useState(dayjs().startOf("month").format("YYYY-MM"));
+  const refreshDiaries = useSetAtom(MonthDiariesAtom);
+  const setDiaryMonth = useSetAtom(DiaryMonthAtom);
   useEffect(() => {
-    setDiaryMonth(date.format("YYYY-MM"));
-  }, []);
-  useEffect(() => {
-    const calendar = [];
-    let cursor = dayjs(date);
-    while (cursor.format("YYYYMM") === date.format("YYYYMM")) {
-      calendar.push({
-        label: cursor.format("D"),
-        date: cursor.format("YYYY-MM-DD"),
-        day: cursor.format("ddd"),
-        diary: diaries.find((t) => t.date === cursor.format("YYYY-MM-DD")),
-      });
-      cursor = cursor.add(1, "day");
-    }
-    setCalendar(calendar);
-  }, [diaries]);
+    setDiaryMonth(ym);
+  }, [ym]);
   useFocusEffect(
     useCallback(() => {
       refreshDiaries();
     }, [])
   );
-  function moveOffset(offset: number) {
-    const next = date.add(offset, "month");
-    setDate(next);
-    setDiaryMonth(next.format("YYYY-MM"));
+  const center = dayjs(ym + "-01").startOf("month");
+  const pages: string[] = [];
+  for (let i = 0; i < PAGES; i++) {
+    pages.push(center.subtract(PAGES - i, "month").format("YYYY-MM"));
+  }
+  pages.push(center.format("YYYY-MM"));
+  for (let i = 0; i < PAGES; i++) {
+    pages.push(center.add(i + 1, "month").format("YYYY-MM"));
+  }
+  function changePage(e: any) {
+    setYm(pages[e.nativeEvent.position]);
   }
   return (
     <View style={{ flex: 1 }}>
-      <MonthHeader onMove={moveOffset}>{date.format("YYYY年MM月")}</MonthHeader>
-      <View style={{ flex: 1 }}>
-        <FlatList
-          data={calendar}
-          renderItem={({ item }) => <DateRow date={item}></DateRow>}
-        ></FlatList>
-      </View>
+      <PagerView
+        style={{ flex: 1 }}
+        initialPage={2}
+        onPageSelected={changePage}
+      >
+        {pages.map((ym, i) => (
+          <Calendar ym={ym} key={ym}></Calendar>
+        ))}
+        <Calendar ym={ym}></Calendar>
+      </PagerView>
     </View>
   );
 }

@@ -8,8 +8,15 @@ import dayjs from "dayjs";
 export const DiaryMonthAtom = atom(dayjs().format("YYYY-MM"));
 export const MonthDiariesAtom = atomWithRefresh(async (get) => {
   const ym = get(DiaryMonthAtom);
-  const start = dayjs(`${ym}-01`).startOf("month").format("YYYY-MM-DD");
-  const end = dayjs(`${ym}-01`).endOf("month").format("YYYY-MM-DD");
+  const start = dayjs(`${ym}-01`)
+    .subtract(2, "months")
+    .startOf("month")
+    .format("YYYY-MM-DD");
+  const end = dayjs(`${ym}-01`)
+    .add(2, "months")
+    .endOf("month")
+    .format("YYYY-MM-DD");
+  console.log(start, end);
   return await db
     .select()
     .from(diaries)
