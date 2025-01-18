@@ -9,6 +9,7 @@ import PagerView from "react-native-pager-view";
 const PAGES = 2;
 export default function Index() {
   const [ym, setYm] = useState(dayjs().startOf("month").format("YYYY-MM"));
+  const [scrolling, setScrolling] = useState(false);
   const fetchMonthDiaries = useSetAtom(fetchMonthDiariesAtom);
   useEffect(() => {
     fetchMonthDiaries(ym);
@@ -25,15 +26,23 @@ export default function Index() {
   function changePage(e: any) {
     setYm(pages[e.nativeEvent.position]);
   }
+  function changeState(e: any) {
+    if (e.nativeEvent.pageScrollState === "dragging") {
+      setScrolling(true);
+    } else if (e.nativeEvent.pageScrollState === "idle") {
+      setScrolling(false);
+    }
+  }
   return (
     <View style={{ flex: 1 }}>
       <PagerView
         style={{ flex: 1 }}
         initialPage={2}
         onPageSelected={changePage}
+        onPageScrollStateChanged={changeState}
       >
         {pages.map((ym, i) => (
-          <Calendar ym={ym} key={ym}></Calendar>
+          <Calendar ym={ym} key={ym} scrolling={scrolling}></Calendar>
         ))}
       </PagerView>
     </View>

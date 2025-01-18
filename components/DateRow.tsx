@@ -8,8 +8,9 @@ import { useAppTheme } from "@/lib/theme";
 type DateRowProps = {
   date: CalendarDate;
   diary: any;
+  scrolling: boolean;
 };
-const DateRow: FC<DateRowProps> = ({ date, diary }) => {
+const DateRow: FC<DateRowProps> = ({ date, diary, scrolling }) => {
   const day = dayjs(date.date).day();
   const theme = useAppTheme();
   const router = useRouter();
@@ -73,6 +74,7 @@ const DateRow: FC<DateRowProps> = ({ date, diary }) => {
           onPress={() => {
             moveTo(date.date);
           }}
+          disabled={scrolling}
         >
           <View
             style={{

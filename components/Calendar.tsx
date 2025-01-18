@@ -18,9 +18,10 @@ export type CalendarDate = {
 
 type CalendarProps = {
   ym: string;
+  scrolling: boolean;
 };
 
-export default function Calendar({ ym }: CalendarProps) {
+export default function Calendar({ ym, scrolling }: CalendarProps) {
   const date = dayjs(ym + "-01");
   const [calendar, setCalendar] = useState<CalendarDate[]>([]);
   const diaries = useAtomValue(DiariesAtom);
@@ -39,7 +40,12 @@ export default function Calendar({ ym }: CalendarProps) {
   }, []);
   function makeRow(item: CalendarDate) {
     return (
-      <DateRow date={item} diary={diaries[item.date]} key={item.date}></DateRow>
+      <DateRow
+        date={item}
+        diary={diaries[item.date]}
+        key={item.date}
+        scrolling={scrolling}
+      ></DateRow>
     );
   }
   return (
