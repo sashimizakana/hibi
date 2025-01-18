@@ -57,8 +57,8 @@ const DateDetail = () => {
   }, [params.date]);
   useEffect(() => {
     if (diary) {
-      setText(diary.text);
-      setMarks(diary.marks);
+      setText(diary.text || "");
+      setMarks(diary.marks || []);
     }
   }, [diary]);
   function toggleMark(color: string) {
