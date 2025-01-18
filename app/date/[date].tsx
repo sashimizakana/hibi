@@ -53,6 +53,7 @@ const DateDetail = () => {
   }
   useEffect(() => {
     setDate(params.date as string);
+    return () => setDate("");
   }, [params.date]);
   useEffect(() => {
     if (diary) {
