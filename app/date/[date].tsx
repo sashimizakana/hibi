@@ -1,8 +1,8 @@
 import _ from "lodash";
-import { useState, FC, useEffect, Suspense, useCallback } from "react";
+import { useState, FC, useEffect, Suspense, useCallback, useRef } from "react";
 import { View } from "react-native";
 import MarkSelector from "@/components/MarkSelector";
-import { useGlobalSearchParams } from "expo-router";
+import { useGlobalSearchParams, useNavigation } from "expo-router";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { DayDiaryAtom, DiaryAtom } from "@/atoms/diary";
 import { useAppTheme } from "@/lib/theme";
@@ -29,47 +29,55 @@ const SectionHeader: FC<SectionHeaderProps> = ({ children }) => {
 const DateDetail = () => {
   const params = useGlobalSearchParams();
   const { colors } = useAppTheme();
-  const [editing, setEditing] = useState<any>({
-    date: params.date as string,
-    text: "",
-    marks: [],
-  });
+  const [text, setText] = useState<string>();
+  const [marks, setMarks] = useState<string[]>([]);
   const setDate = useSetAtom(DayDiaryAtom);
   const [diary, setDiary] = useAtom(DiaryAtom);
-  async function saveDiary(diary: any) {
-    const saved = await setDiary(diary);
-    setEditing(saved);
+  const editing = useRef<any>();
+  const navigation = useNavigation();
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("beforeRemove", () => {
+      saveDiary();
+    });
+    return unsubscribe;
+  }, [navigation]);
+  useEffect(() => {
+    editing.current = {
+      date: params.date as string,
+      text,
+      marks,
+    };
+  }, [text, marks]);
+  async function saveDiary() {
+    await setDiary(editing.current);
   }
-  const save = useCallback(_.debounce(saveDiary, 300), []);
   useEffect(() => {
     setDate(params.date as string);
   }, [params.date]);
   useEffect(() => {
     if (diary) {
-      setEditing(diary);
+      setText(diary.text);
+      setMarks(diary.marks);
     }
-    return () => setDate("");
   }, [diary]);
   function toggleMark(color: string) {
-    let marks = editing.marks || [];
-    if (marks.includes(color)) {
-      marks = marks.filter((c: any) => c !== color);
+    let newMarks = [...marks];
+    if (newMarks.includes(color)) {
+      newMarks = newMarks.filter((c: any) => c !== color);
     } else {
-      marks.push(color);
+      newMarks.push(color);
     }
-    setEditing({ ...editing, marks });
-    save({ ...editing, marks });
+    setMarks(newMarks);
   }
   function onChangeText(text: string) {
-    setEditing({ ...editing, text });
-    save({ ...editing, text });
+    setText(text);
   }
   return (
     <View style={{ flex: 1 }}>
       <View>
         <TextInput
           onChangeText={onChangeText}
-          value={editing.text}
+          value={text}
           placeholder="どんな日？"
           style={[
             styles.input,
@@ -93,7 +101,7 @@ const DateDetail = () => {
           <MarkSelector
             key={color}
             color={color}
-            isActive={editing.marks?.includes(color)}
+            isActive={marks.includes(color)}
             onToggle={() => toggleMark(color)}
           ></MarkSelector>
         ))}
