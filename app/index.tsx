@@ -41,7 +41,7 @@ export default function Index() {
         onPageSelected={changePage}
         onPageScrollStateChanged={changeState}
       >
-        {pages.map((ym, i) => (
+        {pages.map((ym) => (
           <Calendar ym={ym} key={ym} scrolling={scrolling}></Calendar>
         ))}
       </PagerView>

@@ -3,7 +3,8 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start"
+    "start": "expo start",
+    "migrate": "drizzle-kit generate"
   },
   "jest": {
     "preset": "jest-expo"

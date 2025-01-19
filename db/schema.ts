@@ -18,7 +18,8 @@ export const diaries = sqliteTable(
 );
 
 export const tasks = sqliteTable("tasks", {
-  name: text().primaryKey(),
+  id: integer().primaryKey(),
+  name: text(),
 });
 
 export const todos = sqliteTable(

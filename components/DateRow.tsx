@@ -1,21 +1,28 @@
-import type { CalendarDate } from "@/components/Calendar";
+import _ from "lodash";
+import dayjs from "dayjs";
 import { FC } from "react";
 import { View, Pressable } from "react-native";
-import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 import { Text } from "react-native-paper";
 import { useAppTheme } from "@/lib/theme";
+import { DiariesAtomFamily } from "@/atoms/diary";
+import { useAtomValue } from "jotai";
+
 type DateRowProps = {
-  date: CalendarDate;
-  diary: any;
+  date: string;
   scrolling: boolean;
 };
-const DateRow: FC<DateRowProps> = ({ date, diary, scrolling }) => {
-  const day = dayjs(date.date).day();
+
+const DateRow: FC<DateRowProps> = ({ date, scrolling }) => {
+  const diary = useAtomValue(DiariesAtomFamily(date));
+  const dateObj = dayjs(date);
+  const dateNumber = dateObj.date();
+  const dayNumber = dateObj.day();
+  const day = dateObj.format("ddd");
   const theme = useAppTheme();
   const router = useRouter();
   let color;
-  switch (day) {
+  switch (dayNumber) {
     case 0:
       color = "#522";
       break;
@@ -28,6 +35,8 @@ const DateRow: FC<DateRowProps> = ({ date, diary, scrolling }) => {
   function moveTo(date: string) {
     router.push(`/date/${date}`);
   }
+  const text = diary?.text || "";
+  const marks = diary?.marks || [];
   return (
     <View
       style={{
@@ -49,7 +58,7 @@ const DateRow: FC<DateRowProps> = ({ date, diary, scrolling }) => {
           justifyContent: "center",
         }}
       >
-        <Text style={{ textAlign: "center" }}>{date.label}</Text>
+        <Text style={{ textAlign: "center" }}>{dateNumber}</Text>
       </View>
       <View
         style={{
@@ -60,7 +69,7 @@ const DateRow: FC<DateRowProps> = ({ date, diary, scrolling }) => {
           justifyContent: "center",
         }}
       >
-        <Text style={{ textAlign: "center" }}>{date.day}</Text>
+        <Text style={{ textAlign: "center" }}>{day}</Text>
       </View>
       <View style={{ flex: 1, justifyContent: "center", height: "100%" }}>
         <Pressable
@@ -72,7 +81,7 @@ const DateRow: FC<DateRowProps> = ({ date, diary, scrolling }) => {
             position: "relative",
           }}
           onPress={() => {
-            moveTo(date.date);
+            moveTo(date);
           }}
           disabled={scrolling}
         >
@@ -85,7 +94,7 @@ const DateRow: FC<DateRowProps> = ({ date, diary, scrolling }) => {
               gap: 1,
             }}
           >
-            {diary?.marks?.map((mark: string) => (
+            {marks.map((mark: string) => (
               <View
                 key={mark}
                 style={{
@@ -98,7 +107,7 @@ const DateRow: FC<DateRowProps> = ({ date, diary, scrolling }) => {
             ))}
           </View>
           <Text numberOfLines={1} ellipsizeMode="tail">
-            {diary?.text}
+            {text}
           </Text>
         </Pressable>
       </View>

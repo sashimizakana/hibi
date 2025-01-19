@@ -10,6 +10,8 @@ import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import migrations from "@/db/migrations/migrations";
 import { useAppTheme } from "@/lib/theme";
+import { fetchTasksAtom } from "@/atoms/task";
+import { useSetAtom } from "jotai";
 
 dayjs.locale("ja");
 
@@ -62,13 +64,17 @@ function Index() {
 
 export default function RootLayout() {
   useDrizzleStudio(db);
-  //初回表示時に本日の詳細ページを開く
   const router = useRouter();
   const params = useGlobalSearchParams();
+  const fetchTasks = useSetAtom(fetchTasksAtom);
   const { success, error } = useMigrations(expoDB, migrations);
   useEffect(() => {
-    if (!params.date && success) {
-      router.push(`./date/${dayjs().format("YYYY-MM-DD")}`);
+    if (success) {
+      fetchTasks();
+      if (!params.date) {
+        //初回表示時に本日の詳細ページを開く
+        router.push(`./date/${dayjs().format("YYYY-MM-DD")}`);
+      }
     }
   }, [success]);
   const theme = useAppTheme();

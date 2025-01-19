@@ -1,14 +1,14 @@
 import _ from "lodash";
 import { useState, FC, useEffect, Suspense, useCallback, useRef } from "react";
 import { View } from "react-native";
-import MarkSelector from "@/components/MarkSelector";
 import { useGlobalSearchParams, useNavigation } from "expo-router";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { DayDiaryAtom, DiaryAtom } from "@/atoms/diary";
+import { DiariesAtomFamily } from "@/atoms/diary";
 import { useAppTheme } from "@/lib/theme";
 import { Text, TextInput } from "react-native-paper";
-
-const markColors = ["#26547C", "#EF476F", "#FFD166", "#06D6A0", "#FCFCFC"];
+import Todos from "@/components/Todos";
+import Tasks from "@/components/Tasks";
+import Marks from "@/components/Marks";
 
 interface SectionHeaderProps {
   children: string;
@@ -28,51 +28,28 @@ const SectionHeader: FC<SectionHeaderProps> = ({ children }) => {
 
 const DateDetail = () => {
   const params = useGlobalSearchParams();
+  const date = params.date as string;
   const { colors } = useAppTheme();
   const [text, setText] = useState<string>();
-  const [marks, setMarks] = useState<string[]>([]);
-  const setDate = useSetAtom(DayDiaryAtom);
-  const [diary, setDiary] = useAtom(DiaryAtom);
-  const editing = useRef<any>();
+  const [diary, saveDiary] = useAtom(DiariesAtomFamily(date));
+  const editingText = useRef<string>();
   const navigation = useNavigation();
+  async function save() {
+    await saveDiary({ text: editingText.current });
+  }
+  function onChangeText(text: string) {
+    setText(text);
+    editingText.current = text;
+  }
   useEffect(() => {
     const unsubscribe = navigation.addListener("beforeRemove", () => {
-      saveDiary();
+      save();
     });
     return unsubscribe;
   }, [navigation]);
   useEffect(() => {
-    editing.current = {
-      date: params.date as string,
-      text,
-      marks,
-    };
-  }, [text, marks]);
-  async function saveDiary() {
-    await setDiary(editing.current);
-  }
-  useEffect(() => {
-    setDate(params.date as string);
-    return () => setDate("");
-  }, [params.date]);
-  useEffect(() => {
-    if (diary) {
-      setText(diary.text || "");
-      setMarks(diary.marks || []);
-    }
+    onChangeText(diary?.text || "");
   }, [diary]);
-  function toggleMark(color: string) {
-    let newMarks = [...marks];
-    if (newMarks.includes(color)) {
-      newMarks = newMarks.filter((c: any) => c !== color);
-    } else {
-      newMarks.push(color);
-    }
-    setMarks(newMarks);
-  }
-  function onChangeText(text: string) {
-    setText(text);
-  }
   return (
     <View style={{ flex: 1 }}>
       <View>
@@ -98,20 +75,15 @@ const DateDetail = () => {
           justifyContent: "space-around",
         }}
       >
-        {markColors.map((color) => (
-          <MarkSelector
-            key={color}
-            color={color}
-            isActive={marks.includes(color)}
-            onToggle={() => toggleMark(color)}
-          ></MarkSelector>
-        ))}
+        <Marks date={date}></Marks>
       </View>
       <View>
         <SectionHeader>TODO</SectionHeader>
+        <Todos date={date}></Todos>
       </View>
       <View>
         <SectionHeader>タスク</SectionHeader>
+        <Tasks date={date}></Tasks>
       </View>
     </View>
   );
