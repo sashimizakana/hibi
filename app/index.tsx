@@ -30,7 +30,7 @@ export default function Index() {
     if (e.nativeEvent.pageScrollState === "dragging") {
       setScrolling(true);
     } else if (e.nativeEvent.pageScrollState === "idle") {
-      setScrolling(false);
+      setTimeout(() => setScrolling(false), 300);
     }
   }
   return (

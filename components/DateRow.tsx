@@ -81,6 +81,9 @@ const DateRow: FC<DateRowProps> = ({ date, scrolling }) => {
             position: "relative",
           }}
           onPress={() => {
+            if (scrolling) {
+              return;
+            }
             moveTo(date);
           }}
           disabled={scrolling}
