@@ -1,11 +1,12 @@
 import _ from "lodash";
-import { useState, FC, useEffect, Suspense, useCallback, useRef } from "react";
+import { useState, FC, useEffect } from "react";
 import { View } from "react-native";
-import { useGlobalSearchParams, useNavigation } from "expo-router";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useGlobalSearchParams } from "expo-router";
+import { useAtom } from "jotai";
 import { DiariesAtomFamily } from "@/atoms/diary";
 import { useAppTheme } from "@/lib/theme";
 import { Text, TextInput } from "react-native-paper";
+import useDebounce from "react-use/lib/useDebounce";
 import Todos from "@/components/Todos";
 import Tasks from "@/components/Tasks";
 import Marks from "@/components/Marks";
@@ -31,23 +32,23 @@ const DateDetail = () => {
   const date = params.date as string;
   const { colors } = useAppTheme();
   const [text, setText] = useState<string>();
+  const [loadedDate, setLoadedDate] = useState<string>();
   const [diary, saveDiary] = useAtom(DiariesAtomFamily(date));
-  const editingText = useRef<string>();
-  const navigation = useNavigation();
-  async function save() {
-    await saveDiary({ text: editingText.current });
-  }
-  function onChangeText(text: string) {
+  useDebounce(
+    () => {
+      saveDiary({ text });
+    },
+    300,
+    [text]
+  );
+  async function onChangeText(text: string) {
     setText(text);
-    editingText.current = text;
   }
   useEffect(() => {
-    const unsubscribe = navigation.addListener("beforeRemove", () => {
-      save();
-    });
-    return unsubscribe;
-  }, [navigation]);
-  useEffect(() => {
+    if (loadedDate === diary?.date) {
+      return;
+    }
+    setLoadedDate(diary?.date);
     onChangeText(diary?.text || "");
   }, [diary]);
   return (
