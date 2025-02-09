@@ -7,6 +7,8 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { ConfigAtom, saveConfigAtom } from "@/atoms/config";
 import { messageAtom } from "@/atoms/message";
 import { useRouter } from "expo-router";
+import { importDB } from "@/lib/importer";
+import * as Updates from "expo-updates";
 
 type MenuProps = {
   visible: boolean;
@@ -16,6 +18,7 @@ type MenuProps = {
 export default function Menu({ visible, onRequestClose }: MenuProps) {
   const { colors } = useAppTheme();
   const [exporting, setExporting] = useState(false);
+  const [importing, setImporting] = useState(false);
   const config = useAtomValue(ConfigAtom);
   const setMessage = useSetAtom(messageAtom);
   const saveConfig = useSetAtom(saveConfigAtom);
@@ -27,6 +30,26 @@ export default function Menu({ visible, onRequestClose }: MenuProps) {
     saveConfig("exportDirectory", dir);
     onRequestClose();
     setMessage("エクスポートしました");
+  }
+  async function importData() {
+    Alert.alert("警告", "インポートすると現在のデータが上書きされます", [
+      {
+        text: "キャンセル",
+        onPress: () => {},
+        style: "cancel",
+      },
+      {
+        text: "OK",
+        onPress: async () => {
+          setImporting(true);
+          await importDB();
+          setImporting(false);
+          onRequestClose();
+          setMessage("インポートしました");
+          Updates.reloadAsync();
+        },
+      },
+    ]);
   }
   return (
     <Modal
@@ -60,6 +83,9 @@ export default function Menu({ visible, onRequestClose }: MenuProps) {
               disabled={exporting}
             >
               {exporting ? "エクスポート中..." : "エクスポート"}
+            </Button>
+            <Button onPress={() => importData()} disabled={importing}>
+              {importing ? "インポート中..." : "インポート"}
             </Button>
           </View>
         </View>
