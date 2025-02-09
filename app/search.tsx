@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { View, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
 import db from "@/db/db";
 import { diaries } from "@/db/schema";
@@ -19,6 +19,9 @@ const SearchPage: React.FC = () => {
   }, []);
 
   async function fetchItems(next: boolean = false) {
+    if (loading) {
+      return;
+    }
     setLoading(true);
     try {
       const data = await db
@@ -28,7 +31,7 @@ const SearchPage: React.FC = () => {
           search ? like(diaries.text, `%${search}%`) : not(eq(diaries.text, ""))
         )
         .orderBy(desc(diaries.date))
-        .limit(10)
+        .limit(50)
         .offset(next ? items.length : 0);
       setItems((prev) => (next ? [...prev, ...data] : data));
     } catch (error) {
@@ -38,15 +41,15 @@ const SearchPage: React.FC = () => {
     }
   }
 
-  const handleScroll = (event: any) => {
+  async function handleScroll(event: any) {
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
     if (
-      layoutMeasurement.height + contentOffset.y >= contentSize.height - 20 &&
-      !loading
+      layoutMeasurement.height + contentOffset.y >= contentSize.height - 30 &&
+      loading === false
     ) {
-      console.log("load start");
+      await fetchItems(true);
     }
-  };
+  }
 
   return (
     <View style={styles.container}>
