@@ -5,7 +5,6 @@ import { useSetAtom } from "jotai";
 import { fetchMonthDiariesAtom } from "@/atoms/diary";
 import Calendar from "@/components/Calendar";
 import PagerView from "react-native-pager-view";
-import { Message } from "@/components/Message";
 
 const PAGES = 2;
 export default function Index() {
@@ -46,7 +45,6 @@ export default function Index() {
           <Calendar ym={ym} key={ym} scrolling={scrolling}></Calendar>
         ))}
       </PagerView>
-      <Message></Message>
     </View>
   );
 }

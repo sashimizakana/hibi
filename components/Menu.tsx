@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { ConfigAtom, saveConfigAtom } from "@/atoms/config";
 import { messageAtom } from "@/atoms/message";
+import { useRouter } from "expo-router";
 
 type MenuProps = {
   visible: boolean;
@@ -18,6 +19,7 @@ export default function Menu({ visible, onRequestClose }: MenuProps) {
   const config = useAtomValue(ConfigAtom);
   const setMessage = useSetAtom(messageAtom);
   const saveConfig = useSetAtom(saveConfigAtom);
+  const router = useRouter();
   async function exportData(exportDirectory: string) {
     setExporting(true);
     const dir = await exportDB(exportDirectory);
@@ -45,6 +47,14 @@ export default function Menu({ visible, onRequestClose }: MenuProps) {
           ]}
         >
           <View>
+            <Button
+              onPress={() => {
+                onRequestClose();
+                router.push("./search");
+              }}
+            >
+              検索
+            </Button>
             <Button
               onPress={() => exportData(config?.exportDirectory)}
               disabled={exporting}

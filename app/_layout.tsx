@@ -13,6 +13,7 @@ import { useAppTheme } from "@/lib/theme";
 import { fetchTasksAtom } from "@/atoms/task";
 import { useSetAtom } from "jotai";
 import { fetchConfigAtom } from "@/atoms/config";
+import { Message } from "@/components/Message";
 
 dayjs.locale("ja");
 
@@ -51,6 +52,12 @@ function Index() {
           }}
         />
         <Stack.Screen
+          name="search"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
           name="date/[date]"
           options={({ route }) => ({
             title: route.params
@@ -59,6 +66,7 @@ function Index() {
           })}
         />
       </Stack>
+      <Message></Message>
     </View>
   );
 }
