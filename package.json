@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "migrate": "drizzle-kit generate"
+    "migrate": "drizzle-kit generate",
+    "update": "eas update --channel production --platform android"
   },
   "jest": {
     "preset": "jest-expo"
