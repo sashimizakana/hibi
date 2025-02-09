@@ -5,14 +5,22 @@ import { useSetAtom } from "jotai";
 import { fetchMonthDiariesAtom } from "@/atoms/diary";
 import Calendar from "@/components/Calendar";
 import PagerView from "react-native-pager-view";
+import { fetchHolidaysAtom, loadHolidaysAtom } from "@/atoms/holiday";
 
 const PAGES = 2;
 export default function Index() {
   const [ym, setYm] = useState(dayjs().startOf("month").format("YYYY-MM"));
   const [scrolling, setScrolling] = useState(false);
   const fetchMonthDiaries = useSetAtom(fetchMonthDiariesAtom);
-  useEffect(() => {
+  const fetchHolidays = useSetAtom(fetchHolidaysAtom);
+  const loadHolidays = useSetAtom(loadHolidaysAtom);
+  async function loadMonth(ym: string) {
     fetchMonthDiaries(ym);
+    await loadHolidays(ym.split("-")[0]);
+    fetchHolidays(ym);
+  }
+  useEffect(() => {
+    loadMonth(ym);
   }, [ym]);
   const center = dayjs(ym + "-01").startOf("month");
   const pages: string[] = [];

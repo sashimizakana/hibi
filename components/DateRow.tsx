@@ -7,6 +7,7 @@ import { Text } from "react-native-paper";
 import { useAppTheme } from "@/lib/theme";
 import { DiariesAtomFamily } from "@/atoms/diary";
 import { useAtomValue } from "jotai";
+import { HolidaysAtomFamily } from "@/atoms/holiday";
 
 type DateRowProps = {
   date: string;
@@ -15,6 +16,7 @@ type DateRowProps = {
 
 const DateRow: FC<DateRowProps> = ({ date, scrolling }) => {
   const diary = useAtomValue(DiariesAtomFamily(date));
+  const holiday = useAtomValue(HolidaysAtomFamily(date));
   const dateObj = dayjs(date);
   const dateNumber = dateObj.date();
   const dayNumber = dateObj.day();
@@ -22,15 +24,19 @@ const DateRow: FC<DateRowProps> = ({ date, scrolling }) => {
   const theme = useAppTheme();
   const router = useRouter();
   let color;
-  switch (dayNumber) {
-    case 0:
-      color = "#522";
-      break;
-    case 6:
-      color = "#225";
-      break;
-    default:
-      color = theme.colors.background;
+  if (holiday) {
+    color = "#522";
+  } else {
+    switch (dayNumber) {
+      case 0:
+        color = "#522";
+        break;
+      case 6:
+        color = "#225";
+        break;
+      default:
+        color = theme.colors.background;
+    }
   }
   function moveTo(date: string) {
     router.push(`/date/${date}`);

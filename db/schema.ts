@@ -37,3 +37,12 @@ export const configs = sqliteTable("configs", {
   name: text().primaryKey(),
   data: text({ mode: "json" }),
 });
+
+export const holidays = sqliteTable(
+  "holidays",
+  {
+    date: text().primaryKey(),
+    name: text(),
+  },
+  (table) => [uniqueIndex("holidays_date_idx").on(table.date)]
+);

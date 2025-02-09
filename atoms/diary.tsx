@@ -5,19 +5,19 @@ import { diaries } from "@/db/schema";
 import { between, eq } from "drizzle-orm";
 import { atom } from "jotai";
 import dayjs from "dayjs";
+import { fetchHolidaysAtom } from "./holiday";
 
 export const DiariesAtom = atom<any>({});
-export const LoadedMonthAtom = atom<string[]>([]);
 export const fetchMonthDiariesAtom = atom(
   null,
   async (get, set, ym: string) => {
-    set(LoadedMonthAtom, [...get(LoadedMonthAtom), ym]);
     const start = dayjs(`${ym}-01`).startOf("month").format("YYYY-MM-DD");
     const end = dayjs(`${ym}-01`).endOf("month").format("YYYY-MM-DD");
     const data = await db
       .select()
       .from(diaries)
       .where(between(diaries.date, start, end));
+    await set(fetchHolidaysAtom, ym);
     set(DiariesAtom, {
       ...get(DiariesAtom),
       ...Object.fromEntries(data.map((d) => [d.date, d])),
