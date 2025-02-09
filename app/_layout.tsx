@@ -12,6 +12,7 @@ import migrations from "@/db/migrations/migrations";
 import { useAppTheme } from "@/lib/theme";
 import { fetchTasksAtom } from "@/atoms/task";
 import { useSetAtom } from "jotai";
+import { fetchConfigAtom } from "@/atoms/config";
 
 dayjs.locale("ja");
 
@@ -67,14 +68,19 @@ export default function RootLayout() {
   const router = useRouter();
   const params = useGlobalSearchParams();
   const fetchTasks = useSetAtom(fetchTasksAtom);
+  const fetchConfig = useSetAtom(fetchConfigAtom);
   const { success, error } = useMigrations(expoDB, migrations);
+  async function initialize() {
+    await fetchConfig();
+    await fetchTasks();
+    if (!params.date) {
+      //初回表示時に本日の詳細ページを開く
+      router.push(`./date/${dayjs().format("YYYY-MM-DD")}`);
+    }
+  }
   useEffect(() => {
     if (success) {
-      fetchTasks();
-      if (!params.date) {
-        //初回表示時に本日の詳細ページを開く
-        router.push(`./date/${dayjs().format("YYYY-MM-DD")}`);
-      }
+      initialize();
     }
   }, [success]);
   const theme = useAppTheme();

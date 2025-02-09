@@ -32,3 +32,8 @@ export const todos = sqliteTable(
   },
   (table) => [index("todos_date_idx").on(table.date)]
 );
+
+export const configs = sqliteTable("configs", {
+  name: text().primaryKey(),
+  data: text({ mode: "json" }),
+});
