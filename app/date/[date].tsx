@@ -2,7 +2,7 @@ import _ from "lodash";
 import { useState, FC, useEffect } from "react";
 import { View } from "react-native";
 import { useGlobalSearchParams } from "expo-router";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { DiariesAtomFamily } from "@/atoms/diary";
 import { useAppTheme } from "@/lib/theme";
 import { Text, TextInput } from "react-native-paper";
@@ -10,6 +10,7 @@ import useDebounce from "react-use/lib/useDebounce";
 import Todos from "@/components/Todos";
 import Tasks from "@/components/Tasks";
 import Marks from "@/components/Marks";
+import { HolidaysAtomFamily } from "@/atoms/holiday";
 
 interface SectionHeaderProps {
   children: string;
@@ -34,6 +35,7 @@ const DateDetail = () => {
   const [text, setText] = useState<string>();
   const [loadedDate, setLoadedDate] = useState<string>();
   const [diary, saveDiary] = useAtom(DiariesAtomFamily(date));
+  const holiday = useAtomValue(HolidaysAtomFamily(date));
   useDebounce(
     () => {
       saveDiary({ text });
@@ -53,6 +55,11 @@ const DateDetail = () => {
   }, [diary]);
   return (
     <View style={{ flex: 1 }}>
+      {holiday && (
+        <View style={{ paddingLeft: 15 }}>
+          <Text style={{ color: colors.error }}>{holiday.name}</Text>
+        </View>
+      )}
       <View>
         <TextInput
           onChangeText={onChangeText}
