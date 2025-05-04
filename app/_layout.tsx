@@ -81,10 +81,6 @@ export default function RootLayout() {
   async function initialize() {
     await fetchConfig();
     await fetchTasks();
-    if (!params.date) {
-      //初回表示時に本日の詳細ページを開く
-      router.push(`./date/${dayjs().format("YYYY-MM-DD")}`);
-    }
   }
   useEffect(() => {
     if (success) {
