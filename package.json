@@ -5,7 +5,8 @@
   "scripts": {
     "start": "expo start",
     "migrate": "drizzle-kit generate",
-    "update": "eas update --channel production --platform android"
+    "update": "eas update --channel production --platform android",
+    "build": "eas build --profile production --platform android"
   },
   "jest": {
     "preset": "jest-expo"
