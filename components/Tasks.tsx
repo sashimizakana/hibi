@@ -35,7 +35,12 @@ export default function Tasks({ date }: { date: string }) {
           textColor={colors.text}
           onChangeText={setNewTask}
         />
-        <IconButton icon="plus" iconColor={colors.primary} onPress={add} />
+        <IconButton
+          icon="plus"
+          iconColor={colors.primary}
+          onPress={add}
+          disabled={!newTask}
+        />
       </View>
     </View>
   );

@@ -52,12 +52,13 @@ export default function TaskEditor({
         icon="content-save"
         iconColor={colors.primary}
         onPress={save}
+        disabled={editingName.length === 0}
       ></IconButton>
     </View>
   ) : (
     <View style={styles.inputContainer}>
       <Button onPress={() => setEditing(true)} textColor={colors.primary}>
-        {task.name}
+        {task.name || "( None )"}
       </Button>
     </View>
   );
