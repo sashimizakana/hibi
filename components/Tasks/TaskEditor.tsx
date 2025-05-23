@@ -18,33 +18,18 @@ export default function TaskEditor({
   const { colors } = useAppTheme();
   const [editing, setEditing] = useState(false);
   const [editingName, setEditingName] = useState(task?.name || "");
-  const [diary, saveDiary] = useAtom(DiariesAtomFamily(date));
-  const tasks = diary?.tasks || [];
-  const [taskDone, setTaskDone] = useState(tasks.includes(task.id));
   const saveTask = useSetAtom(saveTaskAtom);
   const deleteTask = useSetAtom(deleteTaskAtom);
 
   useEffect(() => {
     setEditingName(task?.name || "");
   }, [task]);
-  useEffect(() => {
-    setTaskDone(tasks.includes(task.id));
-  }, [tasks]);
   function save() {
     saveTask({ ...task, name: editingName });
     setEditing(false);
   }
   async function remove() {
     deleteTask(task.id);
-  }
-  function toggleDone(flag: boolean) {
-    let newTasks = [...tasks];
-    if (flag) {
-      newTasks.push(task.id);
-    } else {
-      newTasks = newTasks.filter((id: number) => id !== task.id);
-    }
-    saveDiary({ tasks: newTasks });
   }
   return editing ? (
     <View style={styles.inputContainer}>
@@ -71,10 +56,6 @@ export default function TaskEditor({
     </View>
   ) : (
     <View style={styles.inputContainer}>
-      <Checkbox
-        status={taskDone ? "checked" : "unchecked"}
-        onPress={() => toggleDone(!taskDone)}
-      ></Checkbox>
       <Button onPress={() => setEditing(true)} textColor={colors.primary}>
         {task.name}
       </Button>

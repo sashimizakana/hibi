@@ -1,0 +1,1 @@
+ALTER TABLE `diaries` DROP COLUMN `tasks`;

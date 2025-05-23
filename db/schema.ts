@@ -12,7 +12,6 @@ export const diaries = sqliteTable(
     date: text().primaryKey(),
     text: text(),
     marks: text({ mode: "json" }),
-    tasks: text({ mode: "json" }),
   },
   (table) => [uniqueIndex("diaries_date_idx").on(table.date)]
 );
