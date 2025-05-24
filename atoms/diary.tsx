@@ -8,20 +8,30 @@ import dayjs from "dayjs";
 import { fetchHolidaysAtom } from "./holiday";
 
 export const DiariesAtom = atom<any>({});
+const cache = new Map<string, any>();
 export const fetchMonthDiariesAtom = atom(
   null,
   async (get, set, ym: string) => {
+    if (cache.has(ym)) {
+      console.log(`Cache hit for ${ym}`);
+      return cache.get(ym);
+    }
     const start = dayjs(`${ym}-01`).startOf("month").format("YYYY-MM-DD");
     const end = dayjs(`${ym}-01`).endOf("month").format("YYYY-MM-DD");
+    const p1 = performance.now();
     const data = await db
       .select()
       .from(diaries)
       .where(between(diaries.date, start, end));
-    await set(fetchHolidaysAtom, ym);
+    console.log(
+      `fetchMonthDiariesAtom: ${ym} took ${performance.now() - p1}ms`
+    );
     set(DiariesAtom, {
       ...get(DiariesAtom),
       ...Object.fromEntries(data.map((d) => [d.date, d])),
     });
+
+    cache.set(ym, data);
     return data;
   }
 );

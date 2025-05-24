@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { useState, FC, useEffect } from "react";
-import { View } from "react-native";
+import { View, ScrollView } from "react-native";
 import { useGlobalSearchParams } from "expo-router";
 import { useAtom, useAtomValue } from "jotai";
 import { DiariesAtomFamily } from "@/atoms/diary";
@@ -54,7 +54,7 @@ const DateDetail = () => {
     onChangeText(diary?.text || "");
   }, [diary]);
   return (
-    <View style={{ flex: 1 }}>
+    <ScrollView style={{ flex: 1 }}>
       {holiday && (
         <View style={{ paddingLeft: 15 }}>
           <Text style={{ color: colors.error }}>{holiday.name}</Text>
@@ -93,7 +93,7 @@ const DateDetail = () => {
         <SectionHeader>タスク</SectionHeader>
         <Tasks date={date}></Tasks>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 const styles = {

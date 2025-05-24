@@ -8,13 +8,15 @@ import { useAppTheme } from "@/lib/theme";
 import { DiariesAtomFamily } from "@/atoms/diary";
 import { useAtomValue } from "jotai";
 import { HolidaysAtomFamily } from "@/atoms/holiday";
+import { atom } from "jotai";
+
+export const scrollingAtom = atom(false);
 
 type DateRowProps = {
   date: string;
-  scrolling: boolean;
 };
 
-const DateRow: FC<DateRowProps> = ({ date, scrolling }) => {
+const DateRow: FC<DateRowProps> = ({ date }) => {
   const diary = useAtomValue(DiariesAtomFamily(date));
   const holiday = useAtomValue(HolidaysAtomFamily(date));
   const dateObj = dayjs(date);
@@ -87,12 +89,8 @@ const DateRow: FC<DateRowProps> = ({ date, scrolling }) => {
             position: "relative",
           }}
           onPress={() => {
-            if (scrolling) {
-              return;
-            }
             moveTo(date);
           }}
-          disabled={scrolling}
         >
           <View
             style={{

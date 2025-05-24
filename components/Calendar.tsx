@@ -6,10 +6,9 @@ import DateRow from "@/components/DateRow";
 
 type CalendarProps = {
   ym: string;
-  scrolling: boolean;
 };
 
-export default function Calendar({ ym, scrolling }: CalendarProps) {
+export default function Calendar({ ym }: CalendarProps) {
   const date = dayjs(ym + "-01");
   const [calendar, setCalendar] = useState<string[]>([]);
   useEffect(() => {
@@ -26,7 +25,7 @@ export default function Calendar({ ym, scrolling }: CalendarProps) {
       <MonthHeader>{date.format("YYYY年MM月")}</MonthHeader>
       <ScrollView style={{ flex: 1 }}>
         {calendar.map((v) => (
-          <DateRow date={v} key={v} scrolling={scrolling}></DateRow>
+          <DateRow date={v} key={v}></DateRow>
         ))}
       </ScrollView>
     </View>

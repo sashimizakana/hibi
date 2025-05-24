@@ -6,22 +6,24 @@ import { fetchMonthDiariesAtom } from "@/atoms/diary";
 import Calendar from "@/components/Calendar";
 import PagerView from "react-native-pager-view";
 import { fetchHolidaysAtom, loadHolidaysAtom } from "@/atoms/holiday";
+import { scrollingAtom } from "@/atoms/scrolling";
 
 const PAGES = 2;
 export default function Index() {
   const [ym, setYm] = useState(dayjs().startOf("month").format("YYYY-MM"));
-  const [scrolling, setScrolling] = useState(false);
+  const setScrolling = useSetAtom(scrollingAtom);
   const fetchMonthDiaries = useSetAtom(fetchMonthDiariesAtom);
   const fetchHolidays = useSetAtom(fetchHolidaysAtom);
   const loadHolidays = useSetAtom(loadHolidaysAtom);
-  async function loadMonth(ym: string) {
-    fetchMonthDiaries(ym);
-    await loadHolidays(ym.split("-")[0]);
-    fetchHolidays(ym);
+
+  async function loadMonth(value: string) {
+    fetchMonthDiaries(value);
+    await loadHolidays(value.split("-")[0]);
+    fetchHolidays(value);
   }
   useEffect(() => {
     loadMonth(ym);
-  }, [ym]);
+  }, []);
   const center = dayjs(ym + "-01").startOf("month");
   const pages: string[] = [];
   for (let i = 0; i < PAGES; i++) {
@@ -32,7 +34,10 @@ export default function Index() {
     pages.push(center.add(i + 1, "month").format("YYYY-MM"));
   }
   function changePage(e: any) {
-    setYm(pages[e.nativeEvent.position]);
+    const value = pages[e.nativeEvent.position];
+    console.log("changePage", e.nativeEvent.position, value);
+    loadMonth(value);
+    setYm(value);
   }
   function changeState(e: any) {
     if (e.nativeEvent.pageScrollState === "dragging") {
@@ -50,7 +55,7 @@ export default function Index() {
         onPageScrollStateChanged={changeState}
       >
         {pages.map((ym) => (
-          <Calendar ym={ym} key={ym} scrolling={scrolling}></Calendar>
+          <Calendar ym={ym} key={ym}></Calendar>
         ))}
       </PagerView>
     </View>

@@ -39,7 +39,7 @@ export const loadHolidaysAtom = atom(null, async (get, set, year: string) => {
     const json = await res.json();
     const items = Object.entries(json).map(([date, name]) => ({
       date,
-      name,
+      name: String(name),
     }));
     await db.insert(holidays).values(items);
     set(HolidaysAtom, {
